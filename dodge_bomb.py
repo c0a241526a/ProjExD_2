@@ -5,6 +5,12 @@ import pygame as pg
 
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+DELTA={ #  移動量辞書　辞書(dict)は{}で作る
+    pg.K_UP:(0,-5),
+    pg.K_DOWN:(0,+5),
+    pg.K_LEFT:(-5,0),
+    pg.K_RIGHT:(+5,0),
+    }
 
 
 def main():
@@ -22,16 +28,20 @@ def main():
                 return
         screen.blit(bg_img, [0, 0]) 
 
-        key_lst = pg.key.get_pressed()
+        key_lst = pg.key.get_pressed()#キー押したとき
         sum_mv = [0, 0]
-        if key_lst[pg.K_UP]:
-            sum_mv[1] -= 5
-        if key_lst[pg.K_DOWN]:
-            sum_mv[1] += 5
-        if key_lst[pg.K_LEFT]:
-            sum_mv[0] -= 5
-        if key_lst[pg.K_RIGHT]:
-            sum_mv[0] += 5
+        for key, mv in DELTA.items():#  items()で辞書の二つの内容をそれぞれkeyとmvにとれる
+            if key_lst[key]:
+                sum_mv[0]+=mv[0]
+                sum_mv[1]+=mv[1]
+        #if key_lst[pg.K_UP]:
+        #    sum_mv[1] -= 5
+        #if key_lst[pg.K_DOWN]:
+        #    sum_mv[1] += 5
+        #if key_lst[pg.K_LEFT]:
+        #    sum_mv[0] -= 5
+        #if key_lst[pg.K_RIGHT]:
+        #    sum_mv[0] += 5
         kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
         pg.display.update()
