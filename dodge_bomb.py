@@ -28,7 +28,7 @@ def check_bound(rct: pg.Rect) -> tuple[bool,bool]:  # (型:) ->returnされる�
     return yoko,tate  # 横方向,縦方向の画面内判定結果を返す 
 def gameover(screen: pg.Surface) -> None:
     """
-    GameOver時に表示する画面の定義
+    GameOver時に表示する画面の関数
     引数:screen (画面用のSurfaceインスタンス)
     戻り値:なし
     """
@@ -50,6 +50,22 @@ def gameover(screen: pg.Surface) -> None:
     screen.blit(go_txt,[WIDTH/3,HEIGHT/2])  #　GameOverの表示
     pg.display.update()  # ディスプレイのアップデート
     time.sleep(5)  # 5秒間表示
+
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:  # 爆弾Surfaceの加速と拡大
+    """
+    時間で爆弾が加速し拡大する関数
+    引数:なし
+    戻り値:tuple[爆弾の拡大のしかたのリスト,爆弾の速度のリスト]
+    """
+    lst_Surface=[]  # list[pg.Surface]用の空のリスト
+    bb_accs = [a for a in range(1, 11)]
+    for  r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))  # 爆弾のSurfaceの拡大
+        pg.draw.circle(bb_img, (255,0, 0), (10*r, 10*r), 10*r)  # 爆弾の拡大
+        bb_img.set_colorkey((0, 0, 0))  # 黒色を透明に設定
+        lst_Surface.append(bb_img)  # リストに追加
+
+    return  [lst_Surface,bb_accs]  # タプルを返す
 
 
 def main():
@@ -97,12 +113,20 @@ def main():
         if check_bound(kk_rct) != (True,True):  # どこかしら画面外だったら(こうかとん)
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])  # 移動をなかったことにする
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx,vy)  # 爆弾の移動
+        #bb_rct.move_ip(vx,vy)  # 爆弾の移動
         yoko,tate=check_bound(bb_rct) 
         if not yoko:  # 横方向が画面外の時
             vx*=-1
         if not tate:  # 縦方向が画面外の時
             vy*=-1
+
+        bb_imgs, bb_accs = init_bb_imgs()  # init_bb_imgs()から[爆弾のSurfaceのリスト,爆弾の速度のリスト]
+        avx = vx*bb_accs[min(tmr//500, 9)]  # 横方向の爆弾の速度を1~9倍
+        avy = vy*bb_accs[min(tmr//500, 9)]  # 縦方向の爆弾の速度を1~9倍
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        bb_rct.move_ip(avx,avy)
+
+        
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
