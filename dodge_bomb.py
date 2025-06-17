@@ -13,6 +13,19 @@ DELTA={ #  移動量辞書　辞書(dict)は{}で作る
     pg.K_RIGHT:(+5,0),
     }
 
+def check_bound(rct: pg.Rect) -> tuple[bool,bool]:  # (型:) ->returnされるもの
+    """
+    引数:こうかとんRectまたは爆弾Rect
+    戻り値:横方向,縦方向の画面内外判定結果
+    画面内ならTrue,画面外ならFlase
+    """
+    yoko,tate=True,True  # 画面の中にあるときはTure
+    if rct.left < 0 or WIDTH < rct.right: # 左が0,右が横幅より大きいとき
+            yoko=False
+    if rct.top < 0 or HEIGHT<rct.bottom:  # # 上が0,下が縦幅より大きいとき
+        tate=False
+    return yoko,tate  # 横方向,縦方向の画面内判定結果を返す 
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -52,8 +65,15 @@ def main():
         #if key_lst[pg.K_RIGHT]:
         #    sum_mv[0] += 5
         kk_rct.move_ip(sum_mv)
+        if check_bound(kk_rct) != (True,True):  # どこかしら画面外だったら(こうかとん)
+            kk_rct.move_ip(-sum_mv[0],-sum_mv[1])  # 移動をなかったことにする
         screen.blit(kk_img, kk_rct)
         bb_rct.move_ip(vx,vy)  # 爆弾の移動
+        yoko,tate=check_bound(bb_rct) 
+        if not yoko:  # 横方向が画面外の時
+            vx*=-1
+        if not tate:  # 縦方向が画面外の時
+            vy*=-1
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
