@@ -1,18 +1,21 @@
 import os
-import sys
-import random
 import pygame as pg
+import random
+import sys
 import time
 
 
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+
 DELTA={ #  移動量辞書　辞書(dict)は{}で作る
     pg.K_UP:(0,-5),
     pg.K_DOWN:(0,+5),
     pg.K_LEFT:(-5,0),
     pg.K_RIGHT:(+5,0),
     }
+
 
 def check_bound(rct: pg.Rect) -> tuple[bool,bool]:  # (型:) ->returnされるもの
     """
@@ -26,6 +29,8 @@ def check_bound(rct: pg.Rect) -> tuple[bool,bool]:  # (型:) ->returnされる�
     if rct.top < 0 or HEIGHT<rct.bottom:  # # 上が0,下が縦幅より大きいとき
         tate=False
     return yoko,tate  # 横方向,縦方向の画面内判定結果を返す 
+
+
 def gameover(screen: pg.Surface) -> None:
     """
     GameOver時に表示する画面の関数
@@ -50,6 +55,7 @@ def gameover(screen: pg.Surface) -> None:
     screen.blit(go_txt,[WIDTH/3,HEIGHT/2])  #　GameOverの表示
     pg.display.update()  # ディスプレイのアップデート
     time.sleep(5)  # 5秒間表示
+
 
 def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:  # 爆弾Surfaceの加速と拡大
     """
@@ -125,7 +131,6 @@ def main():
         avy = vy*bb_accs[min(tmr//500, 9)]  # 縦方向の爆弾の速度を1~9倍
         bb_img = bb_imgs[min(tmr//500, 9)]
         bb_rct.move_ip(avx,avy)
-
         
         screen.blit(bb_img, bb_rct)
         pg.display.update()
