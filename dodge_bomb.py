@@ -2,6 +2,7 @@ import os
 import sys
 import random
 import pygame as pg
+import time
 
 
 WIDTH, HEIGHT = 1100, 650
@@ -25,12 +26,36 @@ def check_bound(rct: pg.Rect) -> tuple[bool,bool]:  # (型:) ->returnされる�
     if rct.top < 0 or HEIGHT<rct.bottom:  # # 上が0,下が縦幅より大きいとき
         tate=False
     return yoko,tate  # 横方向,縦方向の画面内判定結果を返す 
+def gameover(screen: pg.Surface) -> None:
+    """
+    GameOver時に表示する画面の定義
+    引数:screen (画面用のSurfaceインスタンス)
+    戻り値:なし
+    """
+    end_img=pg.Surface((WIDTH,HEIGHT))  # GameOverの時の画像用Surface
+    pg.draw.rect(end_img,(0,0,0),pg.Rect(0,0,WIDTH,HEIGHT))  # 四角形の作成pg.draw.rect(描画用Surface,色,四角形の範囲(pg.Rect(始点の位置,終点の位置)))
+    end_rct=end_img.get_rect()  # GameOverの時の画像のRect
+    end_rct.center=WIDTH/2,HEIGHT/2  # GameOverの時の画像の位置
+    end_img.set_alpha(122)  # 彩度　彩度を変えるSurface.set_alpha(数字)
+    kk_cry_img=pg.image.load("fig/8.png")  # 泣いてるこうかとんの画像
+    kk_cry_rct1=kk_cry_img.get_rect()  # 泣いてるこうかとん(左)の画像のRect
+    kk_cry_rct2=kk_cry_img.get_rect()  # 泣いてるこうかとん(右)の画像のRect
+    kk_cry_rct1.center=WIDTH/3-30,HEIGHT/2+30  # 泣いてるこうかとん(左)の画像の位置
+    kk_cry_rct2.center=WIDTH*2/3+40,HEIGHT/2+30  # 泣いてるこうかとん(右)の画像の位置
+    fonto = pg.font.Font(None, 100)  # フォントを設定
+    go_txt=fonto.render("Game Over",True,(255,255,255))  # Game Over表示の設定
+    screen.blit(end_img, end_rct)  # ブラックアウト表示
+    screen.blit(kk_cry_img,kk_cry_rct1)  #　泣いてるこうかとん(左)の画像の表示
+    screen.blit(kk_cry_img,kk_cry_rct2)  #　泣いてるこうかとん(右)の画像の表示
+    screen.blit(go_txt,[WIDTH/3,HEIGHT/2])  #　GameOverの表示
+    pg.display.update()  # ディスプレイのアップデート
+    time.sleep(5)  # 5秒間表示
 
 
 def main():
-    pg.display.set_caption("逃げろ！こうかとん")
-    screen = pg.display.set_mode((WIDTH, HEIGHT))
-    bg_img = pg.image.load("fig/pg_bg.jpg")    
+    pg.display.set_caption("逃げろ！こうかとん")  # 画面のタイトルを設定する
+    screen = pg.display.set_mode((WIDTH, HEIGHT))  # 画面用のSurfaceインスタンスを生成する
+    bg_img = pg.image.load("fig/pg_bg.jpg")  # 背景画像設定
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
@@ -49,7 +74,8 @@ def main():
             if event.type == pg.QUIT: 
                 return
         if kk_rct.colliderect(bb_rct):  # こうかとんRectと爆弾Rectの衝突判定
-            print("ゲームオーバー")
+            #print("ゲームオーバー")
+            gameover(screen)
             return
         screen.blit(bg_img, [0, 0]) 
 
